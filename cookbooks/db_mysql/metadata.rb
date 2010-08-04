@@ -7,8 +7,8 @@ version          "0.0.1"
 
 depends "mysql", "= 0.9"
 
-provides "db_mysql_restore(url, branch, user, credentials, file_path, schema_name, tmp_dir)"
-provides "db_mysql_set_privileges(type, username, password)"
+provides "db_mysql_restore(:url, :branch, :user, :credentials, :file_path, :schema_name, :tmp_dir)"
+provides "db_mysql_set_privileges(:type, :username, :password)"
 
 recipe  "db_mysql::default", "Runs the 'install_mysql' recipes."
 recipe  "db_mysql::install_mysql", "Installs packages required for MySQL servers without manual intervention."
