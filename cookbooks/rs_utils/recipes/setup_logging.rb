@@ -51,6 +51,8 @@ if "#{node.rightscale.servers.lumberjack.hostname}" != ""
     EOH
   end
   
-  right_link_tag "rs_logging:state=active"
+  skeme_tag "rs_logging:state=active" do
+    action :add
+  end
   
 end

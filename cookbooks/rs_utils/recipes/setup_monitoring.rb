@@ -75,4 +75,6 @@ template File.join(node.rs_utils.collectd_plugin_dir, 'processes.conf') do
   notifies :restart, resources(:service => "collectd")
 end
 
-right_link_tag "rs_monitoring:state=active"
+skeme_tag "rs_monitoring:state=active" do
+  action :add
+end
