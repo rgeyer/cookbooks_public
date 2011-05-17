@@ -145,7 +145,7 @@
   },
   "dependencies": {
     "mysql": [
-      "= 0.9"
+
     ]
   },
   "platforms": {
