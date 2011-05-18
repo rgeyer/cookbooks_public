@@ -48,8 +48,11 @@ package "mysql-client" do
   action :install
 end
 
-r = execute "install mysql gem" do
-  command "/opt/rightscale/sandbox/bin/gem install mysql --no-rdoc --no-ri -v 2.7 -- --build-flags --with-mysql-config"
+r = bash "install mysql gem" do
+  code <<-EOF
+/opt/rightscale/sandbox/bin/gem install mysql --no-rdoc --no-ri -v 2.7 -- --build-flags --with-mysql-config
+/usr/bin/gem install mysql --no-rdoc --no-ri -v 2.7 -- --build-flags --with-mysql-config
+  EOF
 end
 r.run_action(:run)
 
