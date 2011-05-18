@@ -57,6 +57,7 @@ end
 r.run_action(:run)
 
 Gem.clear_paths
+require 'mysql'
 Chef::Log.info("gem reload forced with Gem.clear_paths")
 
 # ready for mysql operations inside recipes and providers
