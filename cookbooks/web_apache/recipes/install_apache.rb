@@ -52,6 +52,10 @@ end
 # include the public recipe for basic installation
 include_recipe "apache2"
 
+if node[:web_apache][:ssl_enable]
+  include_recipe "apache2::mod_ssl"
+end
+
 ## Move Apache
 content_dir = '/mnt/www'
 ruby 'move_apache' do
@@ -65,13 +69,15 @@ ruby 'move_apache' do
 end
 
 ## Move Apache Logs
-apache_name = @node[:apache][:dir].split("/").last
+apache_name = node[:apache][:dir].split("/").last
+log "apache_name was #{apache_name}"
+log "apache log dir was #{node[:apache][:log_dir]}"
 ruby 'move_apache_logs' do
-  not_if do File.symlink?(@node[:apache][:log_dir]) end
+  not_if do File.symlink?(node[:apache][:log_dir]) end
   code <<-EOH
-    `rm -rf #{@node[:apache][:log_dir]}`
+    `rm -rf #{node[:apache][:log_dir]}`
     `mkdir -p /mnt/log/#{apache_name}`
-    `ln -s /mnt/log/#{apache_name} #{@node[:apache][:log_dir]}`
+    `ln -s /mnt/log/#{apache_name} #{node[:apache][:log_dir]}`
   EOH
 end
 
@@ -79,8 +85,8 @@ end
 case node[:platform]
   when "centos","redhat","fedora","suse"
 
-    binary_to_use = @node[:apache][:binary]
-    if @node[:apache][:mpm] != 'prefork'
+    binary_to_use = node[:apache][:binary]
+    if node[:web_apache][:mpm] != 'prefork'
       binary_to_use << ".worker"
     end
 
@@ -90,10 +96,10 @@ case node[:platform]
       variables(
         :sysconfig_httpd => binary_to_use
       )
-      notifies :reload, resources(:service => "apache2")
+      notifies :reload, resources(:service => "apache2"), :immediately
     end
   when "debian","ubuntu"
-    package "apache2-mpm-#{node[:apache][:mpm]}"
+    package "apache2-mpm-#{node[:web_apache][:mpm]}"
 end
 
 # Log resource submitted to opscode. http://tickets.opscode.com/browse/CHEF-923

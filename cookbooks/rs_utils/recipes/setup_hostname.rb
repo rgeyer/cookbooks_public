@@ -1,7 +1,7 @@
 # Cookbook Name:: rs_utils
 # Recipe:: hostname
 #
-# Copyright (c) 2010 RightScale Inc
+# Copyright (c) 2011 RightScale Inc
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -21,6 +21,8 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+rs_utils_marker :begin
 
 require 'socket'
 
@@ -169,3 +171,5 @@ ruby_block "show_new_host_info" do
     Chef::Log.info("FQDN of host: #{`hostname -f` == '' ? '<none>' : `hostname -f`}")
   end
 end
+
+rs_utils_marker :end

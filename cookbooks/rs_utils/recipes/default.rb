@@ -1,7 +1,7 @@
 # Cookbook Name:: rs_utils
 # Recipe:: default
 #
-# Copyright (c) 2010 RightScale Inc
+# Copyright (c) 2011 RightScale Inc
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -22,12 +22,14 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+rs_utils_marker :begin
+
 package "debian-helper-scripts" if node[:platform] == 'ubuntu' && node[:lsb][:codename] == 'hardy'
 
+include_recipe "rs_utils::setup_server_tags"
 include_recipe "rs_utils::setup_timezone"
 include_recipe "rs_utils::setup_logging"
 include_recipe "rs_utils::setup_mail"
 include_recipe "rs_utils::setup_monitoring"
-include_recipe "rs_utils::setup_ssh"
-# Deprication: setup_hostname is no longer required in right_link 5.5
-#include_recipe "rs_utils::setup_hostname"
+
+rs_utils_marker :end
