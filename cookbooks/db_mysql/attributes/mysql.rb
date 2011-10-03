@@ -1,6 +1,6 @@
 # Cookbook Name:: db_mysql
 #
-# Copyright (c) 2009 RightScale Inc
+# Copyright (c) 2011 RightScale Inc
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -33,19 +33,18 @@ set_unless[:db_mysql][:server_id] = Time.now.to_i
 #
 set_unless[:db_mysql][:server_usage] = "dedicated"  # or "shared"
 
-#
+
 # Optional attributes
 #
-set_unless[:db_mysql][:datadir_relocate] = "/mnt/mysql"
+set_unless[:db_mysql][:port] = "3306"
 set_unless[:db_mysql][:log_bin_enabled] = true
 set_unless[:db_mysql][:log_bin] = "/mnt/mysql-binlogs/mysql-bin"
 set_unless[:db_mysql][:tmpdir] = "/tmp"
 set_unless[:db_mysql][:datadir] = "/var/lib/mysql"
-set_unless[:db_mysql][:bind_address] = ipaddress
+set_unless[:db_mysql][:datadir_relocate] = "/mnt/mysql"
+set_unless[:db_mysql][:bind_address] = cloud[:private_ips][0]
 
 #
-# Platform specific attributes
-
 set_unless[:db_mysql][:kill_bug_mysqld_safe] = true
 
 case platform
@@ -80,3 +79,4 @@ else
   set_unless[:db_mysql][:log] = "log = /var/log/mysql.log"
   set_unless[:db_mysql][:log_error] = "log_error = /var/log/mysql.err"
 end
+
