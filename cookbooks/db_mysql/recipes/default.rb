@@ -1,7 +1,7 @@
 # Cookbook Name:: db_mysql
 # Recipe:: default
 #
-# Copyright (c) 2011 RightScale Inc
+# Copyright (c) 2009 RightScale Inc
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -22,4 +22,5 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-include_recipe "db::install_client"
+include_recipe "db_mysql::install_mysql"
+

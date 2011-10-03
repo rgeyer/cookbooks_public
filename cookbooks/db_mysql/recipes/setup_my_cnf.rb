@@ -1,6 +1,7 @@
-# Cookbook Name:: db
+# Cookbook Name:: db_mysql
+# Recipe:: setup_my_cnf
 #
-# Copyright (c) 2011 RightScale Inc
+# Copyright (c) 2009 RightScale Inc
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -21,13 +22,19 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-rs_utils_marker :begin
+#
+# Note! This does NOT restart mysql, only update the my.cnf
+#
 
-DATA_DIR = node[:db][:data_dir]
+template_source = "my.cnf.erb"
 
-block_device DATA_DIR do
-  cron_backup_recipe "#{self.cookbook_name}::do_backup"
-  action :backup_schedule_disable
+template value_for_platform([ "centos", "redhat", "suse" ] => {"default" => "/etc/my.cnf"}, "default" => "/etc/mysql/my.cnf") do
+  source template_source
+  owner "root"
+  group "root"
+  mode "0644"
+  variables(
+    :server_id => @node[:db_mysql][:server_id]
+  )
 end
 
-rs_utils_marker :end

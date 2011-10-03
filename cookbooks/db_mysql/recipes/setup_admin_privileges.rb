@@ -1,6 +1,7 @@
 # Cookbook Name:: db_mysql
+# Recipe:: setup_admin_privileges
 #
-# Copyright (c) 2011 RightScale Inc
+# Copyright (c) 2009 RightScale Inc
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -21,13 +22,9 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-rs_utils_marker :begin
 
-sys_firewall "Open this database's ports to all appservers" do
-  machine_tag "appserver:active=true"
-  port 3306 # mysql only for now
-  enable true
-  action :update
+db_mysql_set_privileges "setup admin privileges" do
+  preset "administrator"
+  username @node[:db][:admin][:user]
+  password @node[:db][:admin][:password]
 end
-
-rs_utils_marker :end
