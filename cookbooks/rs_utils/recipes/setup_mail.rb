@@ -1,26 +1,9 @@
+#
 # Cookbook Name:: rs_utils
-# Recipe:: mail
 #
-# Copyright (c) 2011 RightScale Inc
-#
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the
-# "Software"), to deal in the Software without restriction, including
-# without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to
-# the following conditions:
-#
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# Copyright RightScale, Inc. All rights reserved.  All access and use subject to the
+# RightScale Terms of Service available at http://www.rightscale.com/terms.php and,
+# if applicable, other agreements such as a RightScale Master Subscription Agreement.
 
 rs_utils_marker :begin
 
@@ -37,16 +20,23 @@ end
 # We make the changes needed for centos, but using the default main.cf 
 # config everywhere else
 #
-remote_file "/etc/postfix/main.cf" do
-  only_if { node[:platform] == "centos"}
-  backup 5
+cookbook_file "/etc/postfix/main.cf" do
+  only_if { node[:platform] =~ /centos|redhat/ }
   source "postfix.main.cf"
-#  notifies :restart, resources(:service => "postfix")
+  mode "0644"
+  backup 5
+end
+
+# On CentOS 5.6 and RedHat 5.6, default MTA is sendmail.
+# Change default MTA to postfix.
+execute "set_postfix_default_mta" do
+  only_if { node[:platform] =~ /centos|redhat/ }
+  command "alternatives --set mta /usr/sbin/sendmail.postfix"
 end
 
 # On CentOS 5.4 postfix is not started and chef tries to 'stop' it.  This throws an error.
 # So we'll just start the service here for CentOS.
-if node[:platform] == "centos"
+if node[:platform] =~  /centos|redhat/
   service "postfix" do
     action :start
   end
@@ -65,7 +55,7 @@ directory "/var/spool/oldmail" do
   group "mail"
 end
 
-remote_file "/etc/logrotate.d/mail" do
+cookbook_file "/etc/logrotate.d/mail" do
   source "mail"
 end
 

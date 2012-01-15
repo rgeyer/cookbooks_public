@@ -1,9 +1,17 @@
+# 
+# Cookbook Name:: rs_utils
+#
+# Copyright RightScale, Inc. All rights reserved.  All access and use subject to the
+# RightScale Terms of Service available at http://www.rightscale.com/terms.php and,
+# if applicable, other agreements such as a RightScale Master Subscription Agreement.
+# 
+# Managed by RightScale
+# DO NOT EDIT BY HAND
+#
+
 # syslog-ng configuration file.
 #
 # See syslog-ng(8) and syslog-ng.conf(5) for more information.
-#
-# Managed by RightScale
-# DO NOT EDIT BY HAND
 #
 
 options {
@@ -21,10 +29,11 @@ options {
 
 source s_sys {
     file ("/proc/kmsg" log_prefix("kernel: "));
-    unix-stream ("/dev/log");
+    unix-dgram ("/dev/log");
     internal();
     udp(ip(127.0.0.1) port(514));
 };
+
 
 destination d_cons { file("/dev/console"); };
 destination d_mesg { file("/var/log/messages"); };
@@ -41,7 +50,9 @@ destination d_hpxy { file("/var/log/<%= @apache_log_dir %>/haproxy.log"); };
 #destination d_https { file("/var/log/<%= @apache_log_dir %>/https.log"); };
 destination d_httperror { file("/var/log/<%= @apache_log_dir %>/error_log"); };
 destination d_dhcp { pipe("/dev/null.syslog-ng"); };
+<% if node[:rightscale][:servers][:lumberjack][:hostname] != "" && node[:rs_utils][:enable_remote_logging] == true -%>
 destination d_udp { udp("<%= node[:rightscale][:servers][:lumberjack][:hostname] %>" template("<$PRI>$DATE <%= node[:rightscale][:servers][:lumberjack][:identifier] %>  $MSG")); }; 
+<% end -%>
 
 #
 # fun stuff
@@ -55,9 +66,11 @@ log           { source(s_sys); filter(f_daem); destination(d_daem); };
 # HAproxy should log to facility local2
 filter f_hpxy { facility(local2); };
 log           { source(s_sys); filter(f_hpxy); destination(d_hpxy); };
+<% if node[:rightscale][:servers][:lumberjack][:hostname] != "" && node[:rs_utils][:enable_remote_logging] == true -%>
 # Ship (almost) everything to central syslog system 
 filter f_udp  { not facility(authpriv) or (program(dhclient) and match(DHCPREQUEST)); };
 log           { source(s_sys); filter(f_udp); destination(d_udp); };
+<% end -%>
 # Messages -- need to exclude everything else
 filter f_mesg { level(info..emerg) and
                 not (facility(mail,authpriv,cron,local0,local1,local2,local3) or
@@ -94,3 +107,17 @@ log { source(s_sys); filter(f_filter11); destination(d_dhcp); };
 #log { source(s_sys); filter(f_filter6); destination(d_spol); };
 #filter f_filter7   { facility(local7); };
 #log { source(s_sys); filter(f_filter7); destination(d_boot); };
+
+<% if node[:platform] == 'ubuntu' -%>
+destination df_syslog { file("/var/log/syslog"); };
+
+# all messages except from the auth and authpriv facilities
+filter f_syslog { not facility(auth, authpriv); };
+
+# *.*;auth,authpriv.none          -/var/log/syslog
+log {
+        source(s_sys);
+        filter(f_syslog);
+        destination(df_syslog);
+};
+<% end -%>

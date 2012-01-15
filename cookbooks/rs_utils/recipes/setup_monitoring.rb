@@ -1,26 +1,9 @@
+#
 # Cookbook Name:: rs_utils
-# Recipe:: monitoring
 #
-# Copyright (c) 2011 RightScale Inc
-#
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the
-# "Software"), to deal in the Software without restriction, including
-# without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to
-# the following conditions:
-#
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# Copyright RightScale, Inc. All rights reserved.  All access and use subject to the
+# RightScale Terms of Service available at http://www.rightscale.com/terms.php and,
+# if applicable, other agreements such as a RightScale Master Subscription Agreement.
 
 include_recipe "skeme::default"
 
@@ -42,7 +25,7 @@ package "librrd4" if node[:platform] == 'ubuntu'
 
 arch = (node[:kernel][:machine] == "x86_64") ? "64" : "i386"
 type = (node[:platform] == 'ubuntu') ? "deb" : "rpm"
-installed_ver = (node[:platform] == "centos") ? `rpm -q --queryformat %{VERSION} collectd`.strip : `dpkg-query --showformat='${Version}' -W collectd`.strip 
+installed_ver = (node[:platform] =~ /redhat|centos/) ? `rpm -q --queryformat %{VERSION} collectd`.strip : `dpkg-query --showformat='${Version}' -W collectd`.strip 
 installed = (installed_ver == "") ? false : true
 log 'Collectd package not installed' unless installed
 log "Checking installed collectd version: installed #{installed_ver}" if installed
@@ -81,7 +64,7 @@ remote_file "/etc/apt/preferences.d/00rightscale" do
 end
 
 # If YUM, lock this collectd package so it can't be updated
-if node[:platform] == "centos"
+if node[:platform] =~ /redhat|centos/
   lockfile = "/etc/yum.repos.d/Epel.repo"
   bash "Lock package - YUM" do
     only_if { `grep -c 'exclude=collectd' /etc/yum.repos.d/Epel.repo`.strip == "0" }
@@ -135,7 +118,7 @@ end
 
 # Patch collectd init script, so it uses collectdmon.  
 # Only needed for CentOS, Ubuntu already does this out of the box.
-if node[:platform] == 'centos'
+if node[:platform] =~ /redhat|centos/
   remote_file "/etc/init.d/collectd" do
     source "collectd-init-centos-with-monitor"
     mode 0755

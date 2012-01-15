@@ -1,26 +1,9 @@
+#
 # Cookbook Name:: db_mysql
 #
-# Copyright (c) 2011 RightScale Inc
-#
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the
-# "Software"), to deal in the Software without restriction, including
-# without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to
-# the following conditions:
-#
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+# Copyright RightScale, Inc. All rights reserved.  All access and use subject to the
+# RightScale Terms of Service available at http://www.rightscale.com/terms.php and,
+# if applicable, other agreements such as a RightScale Master Subscription Agreement.
 
 #
 # Adjust values based on a usage factor and create human readable string
@@ -64,12 +47,12 @@ set_unless[:db_mysql][:tunable][:net_read_timeout]                  = 30 * usage
 set_unless[:db_mysql][:tunable][:net_write_timeout]                 = 30 * usage
 set_unless[:db_mysql][:tunable][:back_log]                          = 128 * usage
 set_unless[:db_mysql][:tunable][:max_heap_table_size]               = value_with_units(32,"M",usage)
-set_unless[:db_mysql][:tunable][:expire_logs_days]                  = 10 * usage
 set_unless[:db_mysql][:tunable][:net_buffer_length]                 = value_with_units(16,"K",usage)
 set_unless[:db_mysql][:tunable][:read_buffer_size]                  = value_with_units(1,"M",usage)
 set_unless[:db_mysql][:tunable][:read_rnd_buffer_size]              = value_with_units(4,"M",usage)
 set_unless[:db_mysql][:tunable][:log_slow_queries]                  = "log_slow_queries = /var/log/mysqlslow.log"
 set_unless[:db_mysql][:tunable][:long_query_time]                   = "long_query_time = 5"
+set_unless[:db_mysql][:tunable][:expire_logs_days]                  = 2
 
 #
 # Adjust based on memory range.
