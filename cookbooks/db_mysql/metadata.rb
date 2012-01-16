@@ -16,32 +16,7 @@ attribute "db_mysql",
   :display_name => "General Database Options",
   :type => "hash"
   
-attribute "db/admin/user",
-  :display_name => "Database Admin Username",
-  :description => "The username of the database user that has 'admin' privileges.",
-  :required => true,
-  :recipes => [ "db_mysql::setup_admin_privileges" ]
-
-attribute "db/admin/password",
-  :display_name => "Database Admin Password",
-  :description => "The password of the database user that has 'admin' privileges.",
-  :required => true,
-  :recipes => [ "db_mysql::setup_admin_privileges" ]
-  
-attribute "db/application/user",
-  :display_name => "Database Application Username",
-  :description => "The username of the database user that has 'user' privileges.",
-  :required => true,
-  :recipes => [ "db_mysql::setup_application_privileges" ]
-
-attribute "db/application/password",
-  :display_name => "Database Application Password",
-  :description => "The password of the database user that has 'user' privileges.",
-  :required => true,
-  :recipes => [ "db_mysql::setup_application_privileges" ]
-
-#
-# recommended attributes
+# == Default attributes
 #
 attribute "db_mysql/server_usage",
   :display_name => "Server Usage",
@@ -50,18 +25,10 @@ attribute "db_mysql/server_usage",
   :choice => ["shared", "dedicated"],
   :default => "dedicated"
 
-#
-# optional attributes
-#
 attribute "db_mysql/log_bin",
   :display_name => "MySQL Binlog Destination",
   :description => "Defines the filename and location of your MySQL stored binlog files.  This sets the log-bin variable in the MySQL config file.  If you do not specify an absolute path, it will be relative to the data directory. Ex: /mnt/mysql-binlogs/mysql-bin",
   :recipes => [ "db_mysql::default" ],
   :default => "/mnt/mysql-binlogs/mysql-bin"
-  
-attribute "db_mysql/datadir_relocate",
-  :display_name => "MySQL Data-Directory Destination",
-  :description => "Sets the final destination of the MySQL data directory. (i.e. an LVM or EBS volume)",
-  :default => "/mnt/mysql"
 
 
