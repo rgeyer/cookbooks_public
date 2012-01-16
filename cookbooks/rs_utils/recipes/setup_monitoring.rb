@@ -5,8 +5,6 @@
 # RightScale Terms of Service available at http://www.rightscale.com/terms.php and,
 # if applicable, other agreements such as a RightScale Master Subscription Agreement.
 
-include_recipe "skeme::default"
-
 rs_utils_marker :begin
 
 # These are not conditional assignments, but array joins..  Maybe a different syntax would be a good idea to avoid confusion?
@@ -128,9 +126,7 @@ end
 
 # == Tag required to enable monitoring
 #
-skeme_tag "rs_monitoring:state=active" do
-  action :add
-end
+right_link_tag "rs_monitoring:state=active" 
 
 # == Start monitoring
 #

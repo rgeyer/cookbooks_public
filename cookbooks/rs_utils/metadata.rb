@@ -4,8 +4,6 @@ license          IO.read(File.expand_path(File.join(File.dirname(__FILE__), '..'
 description      "Enable instance Monitoring and logging in the RightScale dashboard."
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.rdoc'))
 version          "0.0.1"
-
-depends "skeme"
  
 recipe "rs_utils::default", "Installs the utilities that are required for RightScale support."
 recipe "rs_utils::setup_logging", "Installs and configures RightScale's dashboard logging features."
