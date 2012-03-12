@@ -7,8 +7,16 @@
 
 rs_utils_marker :begin
 
+class Chef::Recipe
+  include RightScale::BlockDeviceHelper
+end
+
+class Chef::Resource::BlockDevice
+  include RightScale::BlockDeviceHelper
+end
+
 DATA_DIR = node[:db][:data_dir]
-NICKNAME = node[:block_device][:nickname]
+NICKNAME = get_device_or_default(node, :device1, :nickname)
 
 db_init_status :check do
   expected_state :uninitialized
@@ -43,17 +51,17 @@ block_device NICKNAME do
   lineage node[:db][:backup][:lineage]
   lineage_override node[:db][:backup][:lineage_override]
   timestamp_override node[:db][:backup][:timestamp_override]
-  volume_size node[:block_device][:volume_size]
+  volume_size get_device_or_default(node, :device1, :volume_size)
   action :primary_restore
 end
-
-log "  Setting state of database to be 'initialized'..."
-db_init_status :set
 
 log "  Running post-restore cleanup..."
 db DATA_DIR do
   action :post_restore_cleanup
 end
+
+log "  Setting state of database to be 'initialized'..."
+db_init_status :set
 
 log "  Starting database..."
 db DATA_DIR do

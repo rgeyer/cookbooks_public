@@ -8,12 +8,13 @@ recipe "web_apache::default", "Runs web_apache::install_apache."
 recipe "web_apache::do_start", "Runs service apache start"
 recipe "web_apache::do_stop", "Runs service apache stop"
 recipe "web_apache::do_restart", "Runs service apache restart"
+recipe "web_apache::do_enable_default_site", "Enables the default vhost"
 recipe "web_apache::install_apache", "Installs and configures the Apache2 webserver."
 recipe "web_apache::setup_frontend", "Frontend apache vhost.  Select ssl_enabled for SSL."
 recipe "web_apache::setup_frontend_ssl_vhost", "Frontend apache vhost with SSL enabled."
 recipe "web_apache::setup_frontend_http_vhost", "Frontend apache vhost with SSL enabled."
 recipe "web_apache::setup_monitoring", "Install collectd-apache for monitoring support"
-recipe "web_apache::setup_mod_jk_vhost", "Installs, configures mod_jk and creates vhost."
+
 
 all_recipes = [ 
                 "web_apache::default",  
@@ -21,7 +22,6 @@ all_recipes = [
                 "web_apache::setup_frontend_ssl_vhost", 
                 "web_apache::setup_frontend_http_vhost", 
                 "web_apache::setup_frontend",
-				"web_apache::setup_mod_jk_vhost"
               ]
 other_recipes = [ 
                 "web_apache::do_start", 
