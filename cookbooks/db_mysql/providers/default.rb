@@ -269,7 +269,7 @@ action :install_server do
 
   # Setup my.cnf
   template_source = "my.cnf.erb"
-  template "/etc/mysql/my.cnf" do
+  template value_for_platform([ "centos", "redhat", "suse" ] => {"default" => "/etc/my.cnf"}, "default" => "/etc/mysql/my.cnf") do
     source template_source
     owner "root"
     group "root"
