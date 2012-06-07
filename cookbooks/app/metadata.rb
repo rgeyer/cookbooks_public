@@ -1,6 +1,6 @@
 maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
-license          IO.read(File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'LICENSE')))
+license          "Copyright RightScale, Inc. All rights reserved."
 description      "Common utilities for RightScale managed application servers"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.rdoc'))
 version          "0.1"
@@ -8,6 +8,10 @@ version          "0.1"
 depends "sys_firewall"
 depends "rs_utils"
 depends "repo"
+
+depends "app_php"
+depends "app_passenger"
+depends "app_tomcat"
 
 recipe "app::default", "Adds the appserver:active=true tag to your server which identifies it as an application server. For example, database servers will update its firewall port permissions to accept incoming requests from application servers with this tag."
 

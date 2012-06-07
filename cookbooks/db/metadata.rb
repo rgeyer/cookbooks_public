@@ -1,14 +1,15 @@
-maintainer "RightScale, Inc."
+maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
-license IO.read(File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'LICENSE')))
-description "RightScale Database Manager"
+license          "Copyright RightScale, Inc. All rights reserved."
+description      "RightScale Database Manager"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.rdoc'))
-version "0.2"
+version          "0.2"
 
 depends "rs_utils"
 depends "block_device"
 depends "sys_firewall"
 depends "db_mysql"
+depends "db_postgres"
 
 
 recipe "db::default", "Adds the database:active=true tag to your server, identifying it as an database server. The tag is used by application servers to identify active databases. It also loads the required 'db' resources."
@@ -21,7 +22,7 @@ recipe "db::setup_monitoring", "Installs the collectd plugin for database monito
 
 # == Common Database Recipes
 #
-recipe "db::do_primary_backup", "Creates a primary backup of the database using persistent storage in the current cloud. On Rackspace, LVM backups are uploaded to the specified Cloud Files container. For all other clouds, volume snapshots (e.g., Amazon EBS or CloudStack volumes) are used."
+recipe "db::do_primary_backup", :description => "Creates a primary backup of the database using persistent storage in the current cloud. On Rackspace, LVM backups are uploaded to the specified Cloud Files container. For all other clouds, volume snapshots (e.g., Amazon EBS or CloudStack volumes) are used.", :thread => 'db_backup'
 recipe "db::do_primary_restore", "Restores the database from the most recently completed primary backup available in persistent storage of the current cloud."
 
 recipe "db::do_primary_backup_schedule_enable", "Enables db::do_primary_backup to be run periodically."
@@ -30,7 +31,7 @@ recipe "db::do_primary_backup_schedule_disable", "Disables db::do_primary_backup
 recipe "db::setup_privileges_admin", "Adds the username and password for 'superuser' privileges."
 recipe "db::setup_privileges_application", "Adds the username and password for application privileges."
 
-recipe "db::do_secondary_backup", "Creates a backup of the database and uploads it to a secondary cloud storage location, which can be used to migrate your database to a different cloud. For example, you can save a secondary backup to an Amazon S3 bucket or a Rackspace Cloud Files container."
+recipe "db::do_secondary_backup", :description => "Creates a backup of the database and uploads it to a secondary cloud storage location, which can be used to migrate your database to a different cloud. For example, you can save a secondary backup to an Amazon S3 bucket or a Rackspace Cloud Files container.", :thread => 'db_backup'
 recipe "db::do_secondary_restore", "Restores the database from the most recently completed backup available in a secondary location."
 
 recipe "db::do_force_reset", "Resets the database back to a pristine state. WARNING: Execution of this script will delete any data in your database!"
@@ -148,6 +149,11 @@ attribute "db/init_slave_at_boot",
   :choice => [ "true", "false" ],
   :recipes => [ "db::do_init_slave_at_boot" ]
 
+attribute "db/dns/ttl",
+  :display_name => "Database DNS TTL Limit",
+  :description => "The upper limit for the TTL of the master DB DNS record in seconds. This value should be kept low in the event of Master DB failure so that the DNS record updates in a timely manner. When installing the DB server, this value is checked in the DNS records.",
+  :required => "optional",
+  :recipes => [ "db::install_server" ]
 
 # == Backup/Restore
 #
@@ -197,8 +203,8 @@ attribute "db/backup/timestamp_override",
   
 attribute "db/backup/restore_version_check",
   :display_name => "Backup restore version check", 
-  :description => "A variable to allow restore from a backup performed on a different version of the DB software.  Make sure you fully understand the implications of cross version restoration.  Set to false to skip version checking.",
-  :required => false,
+  :description => "A variable to allow to restore from a backup performed on a different version of the DB software. Make sure you fully understand the implications of cross-version restoration.  Set to false to skip version checking.",
+  :required => "optional",
   :choice => [ "true", "false" ],
   :default => "true",
   :recipes => [ 
@@ -244,9 +250,9 @@ attribute "db/dump",
 
 attribute "db/dump/storage_account_provider",
   :display_name => "Dump Storage Account Provider",
-  :description => "Location where dump file will be saved. Used by dump recipes to back up to Amazon S3 or Rackspace Cloud Files.",
+  :description => "Location where the dump file will be saved. Used by dump recipes to back up to Amazon S3 or Rackspace Cloud Files.",
   :required => "required",
-  :choice => [ "S3", "CloudFiles" ],
+  :choice => [ "s3", "cloudfiles", "cloudfilesuk", "SoftLayer_Dallas", "SoftLayer_Singapore", "SoftLayer_Amsterdam" ],
   :recipes => [ "db::do_dump_import", "db::do_dump_export", "db::do_dump_schedule_enable" ]
 
 attribute "db/dump/storage_account_id",

@@ -1,6 +1,6 @@
 maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
-license          IO.read(File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'LICENSE')))
+license          "Copyright RightScale, Inc. All rights reserved."
 description      "Installs/Configures RightScale system utilities."
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.rdoc'))
 version          "0.1"
@@ -28,7 +28,7 @@ attribute "sys/swap_size",
 
 attribute "sys/swap_file",
   :display_name => "Swapfile location",
-  :description => "The location of swap file.  Defaults to '/mnt/ephemeral/swapfile'.",
+  :description => "The location of the swap file.  Defaults to '/mnt/ephemeral/swapfile'.",
   :type => "string",
   :default => "/mnt/ephemeral/swapfile",
   :recipes => [ "sys::setup_swap"]

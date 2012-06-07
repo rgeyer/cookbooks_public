@@ -1,12 +1,13 @@
 maintainer       "RightScale, Inc."
 maintainer_email "support@rightscale.com"
-license          IO.read(File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'LICENSE')))
+license          "Copyright RightScale, Inc. All rights reserved."
 description      "Installs the tomcat application server."
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.rdoc'))
 version          "0.2.1"
 
 depends "app"
 depends "db_mysql"
+depends "db_postgres"
 depends "repo"
 depends "rs_utils"
 
@@ -22,8 +23,8 @@ attribute "tomcat/db_name",
 #Code repo attributes
 attribute "tomcat/code/root_war",
   :display_name => "War file for ROOT",
-  :description => "The name of the war file to be renamed to ROOT.war. Ex: myapplication.war",
-  :required => "optional",
+  :description => "The path to the war file relative to project repo root directory. Will be renamed to ROOT.war. Ex: /dist/app_test.war",
+  :required => "recommended",
   :default => ""
 
 #Java tuning parameters
@@ -62,3 +63,10 @@ attribute "tomcat/java/MaxNewSize",
   :description => "The java MaxNewSize argument (i.e. 256m)",
   :required => "optional",
   :default => "256m"
+
+attribute "tomcat/db_adapter",
+  :display_name => "Database adapter for application ",
+  :description => "Enter database adpter wich will be used to connect to the database Default: postgresql",
+  :default => "mysql",
+  :choice => [ "mysql", "postgresql" ],
+  :recipes => ["app_tomcat::default"]

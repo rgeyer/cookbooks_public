@@ -9,6 +9,8 @@ set_unless[:app_passenger][:rails_spawn_method]="conservative"
 set_unless[:app_passenger][:apache][:maintenance_page]=""
 set_unless[:app_passenger][:apache][:serve_local_files]="true"
 
+set[:app_passenger][:module_dependencies] = ["proxy", "proxy_ajp"]
+
 case node[:platform]
   when "ubuntu","debian"
     set[:app_passenger][:apache][:user]="www-data"
@@ -35,4 +37,3 @@ set_unless[:app_passenger][:project][:custom_cmd]=""
 
 set_unless[:app_passenger][:project][:db][:schema_name]=""
 set_unless[:app_passenger][:project][:db][:adapter]="mysql"
-

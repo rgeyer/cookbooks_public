@@ -99,7 +99,8 @@
       "required": "optional",
       "calculated": false,
       "choice": [
-
+        "mysql",
+        "postgresql"
       ],
       "default": "mysql",
       "type": "string",
@@ -113,9 +114,10 @@
       "required": "optional",
       "calculated": false,
       "choice": [
-
+        "development",
+        "production"
       ],
-      "default": "",
+      "default": "development",
       "type": "string",
       "recipes": [
 
@@ -124,13 +126,13 @@
       "description": "Creates a Rails RAILS ENV environment variable. "
     }
   },
-  "license": "Copyright RightScale, Inc. All rights reserved.  All access and use subject to the RightScale Terms of Service available at http://www.rightscale.com/terms.php and, if applicable, other agreements such as a RightScale Master Subscription Agreement.\n",
+  "license": "Copyright RightScale, Inc. All rights reserved.",
   "suggestions": {
   },
   "platforms": {
   },
   "maintainer": "RightScale, Inc.",
-  "long_description": "= RightScale App Passenger Cookbook\r\n\r\n== DESCRIPTION:\r\n\r\n* Cookbook provides apache+passenger implementation of the app LWRP.\r\n* Installs and configures, apache+passenger application server.\r\n\r\n== REQUIREMENTS:\r\n\r\n* Requires a VM launched from a RightScale managed RightImage\r\n* Tested on CentOS 5.6 RightImage\r\n* Tested on Ubuntu 10.04 RightImage\r\n\r\n== SETUP:\r\n\r\n* Place app_passenger::default recipe into your runlist to setup the application \r\n  server. Since this sets up the app provider, it must be run before the \r\n  app::default recipe (which expects a provider to already be set)\r\n* When using a RightScale ServerTemplate, this will also automatically add the\r\n  common attributes to your ServerTemplate inputs.\r\n\r\n== USAGE:\r\n\r\n* Template can be combined in two modes:\r\n\r\n  1 For apps with bundler support\r\n    You have to add \"install_required app gems\" recipe, and \"run_custom_rails_commands\" for migration commands\r\n  2 For apps without bundler support\r\n    You have to add \"install_custom_gems\"  recipe, and \"run_custom_rails_commands\" for migration commands\r\n  Anyway you can mix these recipes to fit needs of your project.\r\n\r\n== KNOWN LIMITATIONS\r\n\r\n* none\r\n\r\n== DETAILS\r\n\r\nRubyEE packages coming from official RubyEE project page\r\nhttp://code.google.com/p/rubyenterpriseedition/downloads/detail?name=ruby-enterprise-1.8.7-2011.03.tar.gz&can=2&q=\r\nconfigured and packed for Ubuntu CentOS and RHEL.\r\n\r\n= LICENSE\r\n\r\nCopyright RightScale, Inc. All rights reserved.  All access and use subject to the\r\nRightScale Terms of Service available at http://www.rightscale.com/terms.php and,\r\nif applicable, other agreements such as a RightScale Master Subscription Agreement.\r\n",
+  "long_description": "= RightScale App Passenger Cookbook\n\n== DESCRIPTION:\n\n* Cookbook provides apache+passenger implementation of the app LWRP.\n* Installs and configures, apache+passenger application server.\n\n== REQUIREMENTS:\n\n* Requires a VM launched from a RightScale managed RightImage\n* Tested on CentOS 5.6 RightImage\n* Tested on Ubuntu 10.04 RightImage\n\n== SETUP:\n\n* Place app_passenger::default recipe into your runlist to setup the application \n  server. Since this sets up the app provider, it must be run before the \n  app::default recipe (which expects a provider to already be set)\n* When using a RightScale ServerTemplate, this will also automatically add the\n  common attributes to your ServerTemplate inputs.\n\n== USAGE:\n\n* Template can be combined in two modes:\n\n  1 For apps with bundler support\n    You have to add \"install_required app gems\" recipe, and \"run_custom_rails_commands\" for migration commands\n  2 For apps without bundler support\n    You have to add \"install_custom_gems\"  recipe, and \"run_custom_rails_commands\" for migration commands\n  Anyway you can mix these recipes to fit needs of your project.\n\n== KNOWN LIMITATIONS\n\n* none\n\n== DETAILS\n\nRubyEE packages coming from official RubyEE project page\nhttp://code.google.com/p/rubyenterpriseedition/downloads/detail?name=ruby-enterprise-1.8.7-2011.03.tar.gz&can=2&q=\nconfigured and packed for Ubuntu CentOS and RHEL.\n\n= LICENSE\n\nCopyright RightScale, Inc. All rights reserved.  All access and use subject to the\nRightScale Terms of Service available at http://www.rightscale.com/terms.php and,\nif applicable, other agreements such as a RightScale Master Subscription Agreement.\n",
   "version": "0.1.1",
   "recommendations": {
   },

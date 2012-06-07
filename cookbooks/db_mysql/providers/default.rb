@@ -177,12 +177,17 @@ action :install_client do
   #
   # Also installs in compile phase
   #
-  r = execute "install mysql gem" do
-    command "/opt/rightscale/sandbox/bin/gem install mysql --no-rdoc --no-ri -v 2.7 -- --build-flags --with-mysql-config"
+  gem_package 'mysql' do
+    gem_binary '/opt/rightscale/sandbox/bin/gem'
+    version '2.7'
+    options '-- --build-flags --with-mysql-config'
   end
-  r.run_action(:run)
 
-  Gem.clear_paths
+  ruby_block 'clear gem paths for mysql' do
+    block do
+      Gem.clear_paths
+    end
+  end
   log "Gem reload forced with Gem.clear_paths"
 end
 
@@ -245,7 +250,7 @@ action :install_server do
   end
 
   # Create the tmp directory
-  directory "/mnt/mysqltmp" do
+  directory node[:db_mysql][:tmpdir] do
     owner "mysql"
     group "mysql"
     mode 0770
@@ -257,6 +262,16 @@ action :install_server do
     owner "mysql"
     group "mysql"
   end
+
+  # == Ensure that config directories exist
+  #
+  directory "/etc/mysql/conf.d" do
+    owner "mysql"
+    group "mysql"
+    mode 0644
+    recursive true
+  end
+
   # Setup my.cnf
   template_source = "my.cnf.erb"
   template value_for_platform([ "centos", "redhat", "suse" ] => {"default" => "/etc/my.cnf"}, "default" => "/etc/mysql/my.cnf") do
@@ -356,14 +371,12 @@ action :setup_monitoring do
     action :nothing
   end
 
-  arch = node[:kernel][:machine]
-  arch = "i386" if arch == "i686"
   platform = node[:platform]
   # Centos specific items
   TMP_FILE = "/tmp/collectd.rpm"
   remote_file TMP_FILE do
     only_if { platform =~ /redhat|centos/ }
-    source "collectd-mysql-4.10.0-4.el5.#{arch}.rpm"
+    source "collectd-mysql-4.10.0-4.el5.#{node[:kernel][:machine]}.rpm"
     cookbook 'db_mysql'
   end
   package TMP_FILE do

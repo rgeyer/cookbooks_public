@@ -5,10 +5,14 @@
 # RightScale Terms of Service available at http://www.rightscale.com/terms.php and,
 # if applicable, other agreements such as a RightScale Master Subscription Agreement.
 
+# Required attributes
+#
+set_unless[:db_mysql][:version] = '5.5'
+
+
 # Recommended attributes
 #
 set_unless[:db_mysql][:collectd_master_slave_mode] = ""
-set_unless[:db_mysql][:server_usage] = "dedicated"  # or "shared"
 set_unless[:db_mysql][:previous_master] = nil
 
 
@@ -16,8 +20,8 @@ set_unless[:db_mysql][:previous_master] = nil
 #
 set_unless[:db_mysql][:port] = "3306"
 set_unless[:db_mysql][:log_bin_enabled] = true
-set_unless[:db_mysql][:log_bin] = "/mnt/mysql-binlogs/mysql-bin"
-set_unless[:db_mysql][:tmpdir] = "/tmp"
+set_unless[:db_mysql][:log_bin] = "/mnt/ephemeral/mysql-binlogs/mysql-bin"
+set_unless[:db_mysql][:tmpdir] = "/mnt/ephemeral/tmp"
 set_unless[:db_mysql][:datadir] = "/var/lib/mysql"
 set_unless[:db_mysql][:datadir_relocate] = "/mnt/storage"
 # Always set to support stop/start

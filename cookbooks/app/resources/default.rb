@@ -18,7 +18,7 @@ actions :setup_vhost
   # Application root
   attribute :root, :kind_of => String
   # Application port
-  attribute :port, :kind_of => String
+  attribute :port, :kind_of => Integer
 
 
 # Runs application server start sequence
@@ -51,4 +51,3 @@ actions :setup_db_connection
 
 # Action designed to setup APP LWRP with common parameters required for install and configuration of required monitoring software
 actions :setup_monitoring
-

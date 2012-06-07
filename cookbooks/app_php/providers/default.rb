@@ -73,21 +73,14 @@ action :setup_vhost do
     enable false
   end
 
-  node[:apache][:listen_ports] << php_port unless node[:apache][:listen_ports].include?(php_port)
-
-  template "#{node[:apache][:dir]}/ports.conf" do
-    cookbook "apache2"
-    source "ports.conf.erb"
-    variables :apache_listen_ports => node[:apache][:listen_ports]
-  end
-
-
-
+  # Adds php port to list of ports for webserver to listen on
+  app_add_listen_port php_port
+  
   # Configure apache vhost for PHP
   web_app node[:web_apache][:application_name] do
     template "app_server.erb"
     docroot project_root
-    vhost_port php_port
+    vhost_port php_port.to_s
     server_name node[:web_apache][:server_name]
     cookbook "web_apache"
   end
@@ -105,17 +98,30 @@ action :setup_db_connection do
     group node[:php][:app_user]
   end
 
-  # Tell MySQL to fill in our connection template
-  db_mysql_connect_app ::File.join(project_root, "config", "db.php") do
-    template "db.php.erb"
-    cookbook "app_php"
-    database node[:php][:db_schema_name]
-    owner node[:php][:app_user]
-    group node[:php][:app_user]
+  db_adapter = node[:php][:db_adapter]
+  # runs only on db_adapter selection
+  if db_adapter == "mysql"
+    # Tell MySQL to fill in our connection template
+    db_mysql_connect_app ::File.join(project_root, "config", "db.php") do
+      template "db.php.erb"
+      cookbook "app_php"
+      database node[:php][:db_schema_name]
+      owner node[:php][:app_user]
+      group node[:php][:app_user]
+    end
+  elsif db_adapter == "postgresql"
+    # Tell PostgreSQL to fill in our connection template
+    db_postgres_connect_app ::File.join(project_root, "config", "db.php") do
+      template "db.php.erb"
+      cookbook "app_php"
+      database node[:php][:db_schema_name]
+      owner node[:php][:app_user]
+      group node[:php][:app_user]
+    end
+  else
+    raise "Unrecognized database adapter #{node[:php][:db_adapter]}, exiting "
   end
-
 end
-
 
 # Download/Update application repository
 action :code_update do
@@ -150,11 +156,3 @@ action :code_update do
   action_restart
 
 end
-
-
-
-
-
-
-
-

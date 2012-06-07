@@ -29,6 +29,7 @@ action :restart do
   action_start
 end
 
+
 #Installing required packages and prepare system for tomcat
 action :install do
 
@@ -39,7 +40,7 @@ action :install do
     package p
 
     # eclipse-ecj and symlink must be installed FIRST
-    if p=="eclipse-ecj" || "ecj-gcj"
+    if p=="eclipse-ecj" || p=="ecj-gcj"
       file "/usr/share/java/ecj.jar" do
         action :delete
       end
@@ -56,13 +57,30 @@ action :install do
     action :run
   end
 
-  # Link mysql-connector plugin to Tomcat6 lib
-  file "/usr/share/tomcat6/lib/mysql-connector-java.jar" do
-    action :delete
-  end
+  db_adapter = node[:tomcat][:db_adapter]
+  if db_adapter == "mysql"
+    # Link mysql-connector plugin to Tomcat6 lib
+    file "/usr/share/tomcat6/lib/mysql-connector-java.jar" do
+      action :delete
+    end
 
-  link "/usr/share/tomcat6/lib/mysql-connector-java.jar" do
-    to "/usr/share/java/mysql-connector-java.jar"
+    link "/usr/share/tomcat6/lib/mysql-connector-java.jar" do
+      to "/usr/share/java/mysql-connector-java.jar"
+    end
+  elsif db_adapter == "postgresql"
+    # Copy to /usr/share/java/postgresql-9.1-901.jdbc4.jar
+    remote_file "/usr/share/java/postgresql-9.1-901.jdbc4.jar" do
+      source "postgresql-9.1-901.jdbc4.jar"
+      owner "root"
+      group "root"
+      cookbook 'app_tomcat'
+    end
+    ## Link postgresql-connector plugin to Tomcat6 lib
+    link "/usr/share/tomcat6/lib/postgresql-9.1-901.jdbc4.jar" do
+      to "/usr/share/java/postgresql-9.1-901.jdbc4.jar"
+    end
+  else
+    raise "Unrecognized database adapter #{node[:tomcat][:db_adapter]}, exiting "
   end
 
   # "Linking RightImage JAVA_HOME to what Tomcat6 expects to be..."
@@ -98,7 +116,7 @@ action :install do
         cd /usr/lib/jvm-exports
         java_dir=`ls -d java-* -1 2>/dev/null | tail -1`
 
-        if test "$jboss_archive" = "" ; then
+        if ! test "$java_dir" = "" ; then
           ln -s $java_dir java
         fi
       fi
@@ -114,7 +132,6 @@ action :install do
   end
 
 end
-
 
 # Setup apache virtual host and corresponding tomcat configs
 action :setup_vhost do
@@ -184,7 +201,6 @@ action :setup_vhost do
             flags "-ex"
             code <<-EOH
               yum install apr-devel.x86_64 -y
-              yum remove apr-devel.i386 -y
             EOH
           end
         end
@@ -266,13 +282,16 @@ action :setup_vhost do
       docroot4apache = "#{node[:tomcat][:docroot]}/ROOT"
     end
 
+    port = new_resource.port
+
+
     log "  Configuring apache vhost for tomcat"
     template "#{etc_apache}/sites-enabled/#{node[:web_apache][:application_name]}.conf" do
       action :create_if_missing
       source "apache_mod_jk_vhost.erb"
       variables(
         :docroot     => docroot4apache,
-        :vhost_port  => node[:app][:port],
+        :vhost_port  => port.to_s,
         :server_name => node[:web_apache][:server_name],
         :apache_log_dir => node[:apache][:log_dir]
       )
@@ -294,15 +313,29 @@ end
 action :setup_db_connection do
 
   db_name = new_resource.database_name
-
+  db_adapter = node[:tomcat][:db_adapter]
+  
   log "  Creating context.xml"
-  db_mysql_connect_app "/etc/tomcat6/context.xml"  do
-    template      "context_xml.erb"
-    owner         "#{node[:tomcat][:app_user]}"
-    group         "root"
-    mode          "0644"
-    database      db_name
-    cookbook      'app_tomcat'
+  if db_adapter == "mysql"  
+    db_mysql_connect_app "/etc/tomcat6/context.xml"  do
+      template      "context_xml.erb"
+      owner         "#{node[:tomcat][:app_user]}"
+      group         "root"
+      mode          "0644"
+      database      db_name
+      cookbook      'app_tomcat'
+    end
+  elsif db_adapter == "postgresql"  
+    db_postgres_connect_app "/etc/tomcat6/context.xml"  do
+      template      "context_xml.erb"
+      owner         "#{node[:tomcat][:app_user]}"
+      group         "root"
+      mode          "0644"
+      database      db_name
+      cookbook      'app_tomcat'
+    end
+  else
+    raise "Unrecognized database adapter #{node[:tomcat][:db_adapter]}, exiting "
   end
 
   log "  Creating context.xml"
@@ -355,8 +388,9 @@ action :setup_monitoring do
   bash "Add collectd to tomcat.conf" do
     flags "-ex"
     code <<-EOH
-      cat <<EOF>>/etc/tomcat6/tomcat6.conf
+      cat <<'EOF'>>/etc/tomcat6/tomcat6.conf
       CATALINA_OPTS="\$CATALINA_OPTS -Djcd.host=#{node[:rightscale][:instance_uuid]} -Djcd.instance=tomcat6 -Djcd.dest=udp://#{node[:rightscale][:servers][:sketchy][:hostname]}:3011 -Djcd.tmpl=javalang,tomcat -javaagent:/usr/share/tomcat6/lib/collectd.jar"
+      EOF
     EOH
   end
 
@@ -402,6 +436,7 @@ action :code_update do
       chown -R #{node[:tomcat][:app_user]}:#{node[:tomcat][:app_user]} #{node[:tomcat][:docroot]}
       sleep 5
     EOH
+    only_if do node[:tomcat][:code][:root_war] != "ROOT.war" end
   end
 
   action_restart
@@ -409,11 +444,3 @@ action :code_update do
   node[:delete_docroot_executed] = true
 
 end
-
-
-
-
-
-
-
-
